@@ -77,6 +77,7 @@ public class QSPanel extends ViewGroup {
 
     private QSFooter mFooter;
     private boolean mGridContentVisible = true;
+    private boolean mBrightnessEnabled;
 
     public QSPanel(Context context) {
         this(context, null);
@@ -120,6 +121,7 @@ public class QSPanel extends ViewGroup {
     }
 
     public void updateBrightnessSlider(boolean show) {
+		mBrightnessEnabled = show;
         ToggleSlider brightnessSlider = (ToggleSlider) findViewById(R.id.brightness_slider);
         ImageView iconImage = (ImageView) findViewById(R.id.brightness_icon);
         if (show) {
@@ -208,7 +210,7 @@ public class QSPanel extends ViewGroup {
         if (mListening) {
             refreshAllTiles();
         }
-        if (listening) {
+        if (listening && mBrightnessEnabled) {
             mBrightnessController.registerCallbacks();
         } else {
             mBrightnessController.unregisterCallbacks();
