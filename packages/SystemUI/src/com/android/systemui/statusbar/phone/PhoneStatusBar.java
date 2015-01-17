@@ -504,6 +504,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     void updateClockView() {
         mClockView.setVisibility(View.GONE);
+
         switch (mClockLocation) {
             default:
             case 0:
@@ -513,7 +514,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             case 1:
                 mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
                 mClockView.setVisibility(View.VISIBLE);
-                return;
+                break;
             case 2:
                 mClockView = (TextView) mStatusBarView.findViewById(R.id.center_clock);
                 mClockView.setVisibility(View.VISIBLE);
@@ -523,6 +524,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mClockView.setVisibility(View.VISIBLE);
                 break;
         }
+
         setClockAndDateStatus();
         mClockController.updateClockView(mClockView);
     }
@@ -974,7 +976,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
         mClockLocation = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.STATUS_BAR_CLOCK, Clock.STYLE_CLOCK_RIGHT);
-        mClockController = new Clock(mContext, mClockView);
+        if (mClockController == null) mClockController = new Clock(mContext, mClockView);
         updateClockView();
 
         mStackScroller = (NotificationStackScrollLayout) mStatusBarWindowContent.findViewById(
