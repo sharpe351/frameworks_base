@@ -91,6 +91,7 @@ public class KeyButtonView extends ImageView {
 
     private static PowerManager mPm;
     KeyButtonInfo mActions;
+    private KeyButtonRipple mRipple;
 
     private boolean mIsDPadAction;
     private boolean mHasSingleAction = true;
@@ -131,7 +132,7 @@ public class KeyButtonView extends ImageView {
         mLongPressTimeout = ViewConfiguration.getLongPressTimeout();
         setLongClickable(false);
         mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        setBackground(new KeyButtonRipple(context, this));
+        setBackground(mRipple = new KeyButtonRipple(context, this));
         mPm = getPowerManagerService(context);
     }
 
@@ -271,6 +272,9 @@ public class KeyButtonView extends ImageView {
                 if (mHasLongAction) {
                     removeCallbacks(mCheckLongPress);
                 }
+                // hack to fix ripple getting stuck. exitHardware() starts an animation,
+                // but sometimes does not finish it.
+                mRipple.exitSoftware();
                 break;
             case MotionEvent.ACTION_UP:
                 mUpTime = SystemClock.uptimeMillis();
