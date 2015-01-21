@@ -118,6 +118,28 @@ public class QSPanel extends ViewGroup {
         });
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Enable/disable brightness slider.
+     */
+    private boolean showBrightnessSlider() {
+        boolean brightnessSliderEnabled = Settings.Secure.getInt(
+            mContext.getContentResolver(), Settings.Secure.QS_SHOW_BRIGHTNESS_SLIDER,
+                1) == 1;
+        ToggleSlider brightnessSlider = (ToggleSlider) findViewById(R.id.brightness_slider);
+        if (brightnessSliderEnabled) {
+            mBrightnessView.setVisibility(VISIBLE);
+            brightnessSlider.setVisibility(VISIBLE);
+        } else {
+            mBrightnessView.setVisibility(GONE);
+            brightnessSlider.setVisibility(GONE);
+        }
+        updateResources();
+        return brightnessSliderEnabled;
+    }
+
+>>>>>>> cm/cm-12.0
     private void updateDetailText() {
         mDetailDoneButton.setText(R.string.quick_settings_done);
         mDetailSettingsButton.setText(R.string.quick_settings_more_settings);
@@ -221,8 +243,8 @@ public class QSPanel extends ViewGroup {
     }
 
     private void refreshAllTiles() {
-        mUseMainTiles = Settings.System.getIntForUser(getContext().getContentResolver(),
-                Settings.System.QS_USE_MAIN_TILES, 1, UserHandle.myUserId()) == 1;
+        mUseMainTiles = Settings.Secure.getInt(getContext().getContentResolver(),
+                Settings.Secure.QS_USE_MAIN_TILES, 1) == 1;
         for (int i = 0; i < mRecords.size(); i++) {
             TileRecord r = mRecords.get(i);
             r.tileView.setDual(mUseMainTiles && i < 2);

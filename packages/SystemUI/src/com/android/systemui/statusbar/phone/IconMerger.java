@@ -29,7 +29,11 @@ public class IconMerger extends LinearLayout {
     private static final boolean DEBUG = false;
 
     private int mIconSize;
+<<<<<<< HEAD
     private boolean mClockBlock;
+=======
+    private int mClockLocation;
+>>>>>>> cm/cm-12.0
     private View mMoreView;
 
     public IconMerger(Context context, AttributeSet attrs) {
@@ -52,6 +56,10 @@ public class IconMerger extends LinearLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         // we need to constrain this to an integral multiple of our children
         int width = getMeasuredWidth();
+        if (mClockLocation == Clock.STYLE_CLOCK_CENTER) {
+            int totalWidth = mContext.getResources().getDisplayMetrics().widthPixels;
+            width = totalWidth / 2 - mIconSize * 2;
+        }
         setMeasuredDimension(width - (width % mIconSize), getMeasuredHeight());
     }
 
@@ -71,7 +79,18 @@ public class IconMerger extends LinearLayout {
         }
         final boolean overflowShown = (mMoreView.getVisibility() == View.VISIBLE);
         // let's assume we have one more slot if the more icon is already showing
+<<<<<<< HEAD
         if (!mClockBlock && overflowShown) visibleChildren --;
+=======
+        if (overflowShown) {
+            int totalWidth = mContext.getResources().getDisplayMetrics().widthPixels;
+            if ((mClockLocation != Clock.STYLE_CLOCK_CENTER &&
+                    mClockLocation != Clock.STYLE_CLOCK_LEFT) ||
+                    (visibleChildren > (totalWidth / mIconSize / 2 + 1))) {
+                visibleChildren--;
+            }
+        }
+>>>>>>> cm/cm-12.0
         final boolean moreRequired = visibleChildren * mIconSize > width;
         if (moreRequired != overflowShown) {
             post(new Runnable() {
@@ -84,7 +103,12 @@ public class IconMerger extends LinearLayout {
     }
 
     public void setClockAndDateStatus(int mode) {
+<<<<<<< HEAD
         mClockBlock = mode == Clock.STYLE_CLOCK_CENTER || mode == Clock.STYLE_CLOCK_LEFT;
     }
 
+=======
+        mClockLocation = mode;
+    }
+>>>>>>> cm/cm-12.0
 }
