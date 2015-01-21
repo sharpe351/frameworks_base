@@ -29,11 +29,9 @@ public class IconMerger extends LinearLayout {
     private static final boolean DEBUG = false;
 
     private int mIconSize;
-<<<<<<< HEAD
     private boolean mClockBlock;
-=======
     private int mClockLocation;
->>>>>>> cm/cm-12.0
+
     private View mMoreView;
 
     public IconMerger(Context context, AttributeSet attrs) {
@@ -79,9 +77,6 @@ public class IconMerger extends LinearLayout {
         }
         final boolean overflowShown = (mMoreView.getVisibility() == View.VISIBLE);
         // let's assume we have one more slot if the more icon is already showing
-<<<<<<< HEAD
-        if (!mClockBlock && overflowShown) visibleChildren --;
-=======
         if (overflowShown) {
             int totalWidth = mContext.getResources().getDisplayMetrics().widthPixels;
             if ((mClockLocation != Clock.STYLE_CLOCK_CENTER &&
@@ -90,7 +85,6 @@ public class IconMerger extends LinearLayout {
                 visibleChildren--;
             }
         }
->>>>>>> cm/cm-12.0
         final boolean moreRequired = visibleChildren * mIconSize > width;
         if (moreRequired != overflowShown) {
             post(new Runnable() {
@@ -103,12 +97,6 @@ public class IconMerger extends LinearLayout {
     }
 
     public void setClockAndDateStatus(int mode) {
-<<<<<<< HEAD
-        mClockBlock = mode == Clock.STYLE_CLOCK_CENTER || mode == Clock.STYLE_CLOCK_LEFT;
-    }
-
-=======
         mClockLocation = mode;
     }
->>>>>>> cm/cm-12.0
 }

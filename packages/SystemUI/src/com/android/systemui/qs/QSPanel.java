@@ -118,8 +118,6 @@ public class QSPanel extends ViewGroup {
         });
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Enable/disable brightness slider.
      */
@@ -139,7 +137,6 @@ public class QSPanel extends ViewGroup {
         return brightnessSliderEnabled;
     }
 
->>>>>>> cm/cm-12.0
     private void updateDetailText() {
         mDetailDoneButton.setText(R.string.quick_settings_done);
         mDetailSettingsButton.setText(R.string.quick_settings_more_settings);

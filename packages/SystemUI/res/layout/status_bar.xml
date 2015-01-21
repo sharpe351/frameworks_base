@@ -76,7 +76,6 @@
 
                 <TextView
                     android:id="@+id/left_clock"
-<<<<<<< HEAD
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
                     android:gravity="center"
@@ -84,15 +83,6 @@
                     android:paddingEnd="6dip"
                     android:visibility="gone"
                     android:textAppearance="@style/TextAppearance.StatusBar.Clock"
-=======
-                    android:textAppearance="@style/TextAppearance.StatusBar.Clock"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:singleLine="true"
-                    android:paddingEnd="6dip"
-                    android:gravity="center"
-                    android:visibility="gone"
->>>>>>> cm/cm-12.0
                     />
 
                 <com.android.systemui.statusbar.StatusBarIconView android:id="@+id/moreIcon"
@@ -149,19 +139,11 @@
         <TextView
             android:id="@+id/center_clock"
             android:textAppearance="@style/TextAppearance.StatusBar.Clock"
-<<<<<<< HEAD
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:visibility="gone"
             android:singleLine="true"
-=======
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:singleLine="true"
-            android:gravity="center"
-            android:visibility="gone"
->>>>>>> cm/cm-12.0
             />
     </com.android.keyguard.AlphaOptimizedLinearLayout>
 

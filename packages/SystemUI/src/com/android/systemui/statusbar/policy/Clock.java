@@ -269,11 +269,7 @@ public class Clock implements DemoMode {
         ContentResolver resolver = mContext.getContentResolver();
         mAmPmStyle = (Settings.System.getInt(resolver,
                 Settings.System.STATUS_BAR_AM_PM, 2));
-<<<<<<< HEAD
 		mClockFormatString = "";
-=======
-        mClockFormatString = "";
->>>>>>> cm/cm-12.0
 
         updateClock();
     }
