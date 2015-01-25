@@ -71,8 +71,8 @@ public class ExodusUpdaterTile extends QSTile<QSTile.BooleanState> {
                 public void run() {
                     Intent i = new Intent(Intent.ACTION_CHECK_FOR_UPDATES);
                     mContext.sendBroadcast(i);
-				}
-			}, 1200);
+                }
+            }, 1200);
         } else {
             final String cheese = mContext.getString(R.string.update_check_failed);
             Toast.makeText(mContext, cheese, Toast.LENGTH_SHORT).show();
