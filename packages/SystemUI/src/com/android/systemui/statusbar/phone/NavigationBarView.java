@@ -139,7 +139,7 @@ public class NavigationBarView extends LinearLayout {
     private int mDisplayingLayoutIndex;
 
     private String[] mButtonContainerStrings = new String[5];
-    SparseArray<ArrayList<KeyButtonInfo>> mAllButtonContainers = new SparseArray<ArrayList<KeyButtonInfo>>();
+    SparseArray<SparseArray<KeyButtonInfo>> mAllButtonContainers = new SparseArray<SparseArray<KeyButtonInfo>>();
 
     private static final String[] buttonSettings = new String[] {
         Settings.System.NAVIGATION_BAR_BUTTONS,
@@ -527,7 +527,7 @@ public class NavigationBarView extends LinearLayout {
 
         mDisabledFlags = disabledFlags;
 
-        if (mAllButtonContainers.get(mCurrentLayout).isEmpty()) return; // no buttons yet!
+        if (mAllButtonContainers.get(mCurrentLayout).size() == 0) return; // no buttons yet!
 
         final boolean disableHome = ((disabledFlags & View.STATUS_BAR_DISABLE_HOME) != 0);
         final boolean disableRecent = ((disabledFlags & View.STATUS_BAR_DISABLE_RECENT) != 0);
@@ -744,17 +744,19 @@ public class NavigationBarView extends LinearLayout {
         setupNavigationButtons(mAllButtonContainers.get(mCurrentLayout));
     }
 
-    private ArrayList<KeyButtonInfo> getButtonsArray(final String userButtonString) {
+    private SparseArray<KeyButtonInfo> getButtonsArray(final String userButtonString) {
         final String[] userButtons = userButtonString.split("\\|");
-        final ArrayList<KeyButtonInfo> mButtonsContainer = new ArrayList<KeyButtonInfo>();
+        final SparseArray<KeyButtonInfo> mButtonsContainer = new SparseArray<KeyButtonInfo>();
+        int key = 0;
         for (String button : userButtons) {
             final String[] actions = button.split(",", 4);
-            mButtonsContainer.add(new KeyButtonInfo(actions[0], actions[1], actions[2], actions[3]));
+            mButtonsContainer.put(key, new KeyButtonInfo(actions[0], actions[1], actions[2], actions[3]));
+            key = key + 1;
         }
         return mButtonsContainer;
     }
 
-    private void setupNavigationButtons(ArrayList<KeyButtonInfo> buttonsArray) {
+    private void setupNavigationButtons(SparseArray<KeyButtonInfo> buttonsArray) {
         final boolean stockThreeButtonLayout = buttonsArray.size() == 3;
         final int length = buttonsArray.size();
         final int separatorSize = (int) mMenuButtonWidth;
