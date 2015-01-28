@@ -28,6 +28,7 @@ import android.os.Message;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -328,18 +329,21 @@ public class QSPanel extends ViewGroup {
             @Override
             public void onClick(View v) {
                 r.tile.click();
+                performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             }
         };
         final View.OnClickListener clickSecondary = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 r.tile.secondaryClick();
+                performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
             }
         };
         final View.OnLongClickListener clickLong = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 r.tile.longClick();
+                performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
                 return true;
             }
         };
