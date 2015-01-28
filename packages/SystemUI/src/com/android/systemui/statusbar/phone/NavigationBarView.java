@@ -731,16 +731,12 @@ public class NavigationBarView extends LinearLayout {
         mAllButtonContainers.put(NavbarConstants.LAYOUT_IME, getButtonsArray(mIMEKeyLayout));
         for (int j = 0; j < mButtonLayouts; j++) {
             if (mButtonContainerStrings[j] == null || TextUtils.isEmpty(mButtonContainerStrings[j])) {
-                if (j == mCurrentLayout) {
-                    android.widget.Toast.makeText(mContext,
-                            mContext.getResources().getString(R.string.def_navbar_layout_warning),
-                            200).show();
-                }
                 mAllButtonContainers.put(j,getButtonsArray(mDefaultLayout));
             } else {
                 mAllButtonContainers.put(j,getButtonsArray(mButtonContainerStrings[j]));
             }
         }
+        if (mCurrentLayout >= mButtonLayouts) mCurrentLayout = mButtonLayouts - 1;
         setupNavigationButtons(mAllButtonContainers.get(mCurrentLayout));
     }
 
