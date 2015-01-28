@@ -3528,6 +3528,12 @@ public final class Settings {
         public static final String RECENTS_SHOW_HIDE_SEARCH_BAR = "recents_show_hide_search_bar";
 
         /**
+         * This preference enables showing the power menu on LockScreen.
+         * @hide
+         */
+        public static final String LOCKSCREEN_DISABLE_POWER_MENU = "lockscreen_disable_power_menu";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -5903,6 +5909,12 @@ public final class Settings {
         public static final String ADVANCED_REBOOT = "advanced_reboot";
 
         /**
+         * Whether user is allowed to pull down quick settings on secure keyguard.
+         * @hide
+         */
+        public static final String STATUS_BAR_LOCKED_ON_SECURE_KEYGUARD = "status_bar_locked_on_secure_keyguard";
+
+        /**
          * Whether to display a menu containing 'Wipe data', 'Force close' and other options
          * in the notification area and in the recent app list
          * @hide
@@ -6014,7 +6026,8 @@ public final class Settings {
             PRIVACY_GUARD_DEFAULT,
             ADVANCED_REBOOT,
             DEVELOPMENT_SHORTCUT,
-            LOCKSCREEN_QUICK_UNLOCK_CONTROL
+            LOCKSCREEN_QUICK_UNLOCK_CONTROL,
+            STATUS_BAR_LOCKED_ON_SECURE_KEYGUARD
         };
 
         /**
