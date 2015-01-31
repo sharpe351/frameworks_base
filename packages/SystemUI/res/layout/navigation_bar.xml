@@ -39,8 +39,7 @@
             android:orientation="horizontal"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:id="@+id/nav_buttons"
-            android:animateLayoutChanges="true"
+            android:id="@+id/container"
             >
 
         </LinearLayout>
@@ -50,10 +49,13 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:layout_gravity="center_horizontal"
             android:id="@+id/lights_out"
             android:visibility="gone"
             >
-
         </LinearLayout>
 
         <com.android.systemui.statusbar.policy.DeadZone
@@ -81,12 +83,12 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:id="@+id/nav_buttons"
-            android:animateLayoutChanges="true"
+            android:id="@+id/container"
             >
-
         </LinearLayout>
 
         <!-- lights out layout to match exactly -->
@@ -94,10 +96,13 @@
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
             android:id="@+id/lights_out"
             android:visibility="gone"
             >
-
         </LinearLayout>
 
         <com.android.systemui.statusbar.policy.DeadZone

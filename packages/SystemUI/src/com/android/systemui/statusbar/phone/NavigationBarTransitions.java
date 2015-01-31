@@ -106,8 +106,16 @@ public final class NavigationBarTransitions extends BarTransitions {
         }
 
         if (backAlpha > 0) {
-            setKeyButtonViewQuiescentAlpha(mView.getBackButton(), backAlpha, animate);
+            setKeyButtonViewQuiescentAlpha(NavbarEditor.NAVBAR_BACK, backAlpha, animate);
         }
+    }
+
+    private float maxVisibleQuiescentAlpha(float max, NavbarEditor.ButtonInfo info) {
+        View v = mView.findViewWithTag(info);
+        if ((v instanceof KeyButtonView) && v.isShown()) {
+            return Math.max(max, ((KeyButtonView)v).getQuiescentAlpha());
+        }
+        return max;
     }
 
     private static float maxVisibleQuiescentAlpha(float max, View v) {
@@ -115,6 +123,13 @@ public final class NavigationBarTransitions extends BarTransitions {
             return Math.max(max, ((KeyButtonView)v).getQuiescentAlpha());
         }
         return max;
+    }
+
+    private void setKeyButtonViewQuiescentAlpha(NavbarEditor.ButtonInfo info, float alpha, boolean animate) {
+        View button = mView.findViewWithTag(info);
+        if (button != null) {
+            setKeyButtonViewQuiescentAlpha(button, alpha, animate);
+        }
     }
 
     private void setKeyButtonViewQuiescentAlpha(View button, float alpha, boolean animate) {

@@ -2128,4 +2128,8 @@
          setting is used to determine, whether lidOpenRotation has to be
          applied. -->
     <bool name="config_hasRemovableLid">false</bool>
+
+    <!-- Ignored sms packages -->
+    <string-array name="config_ignored_sms_packages"></string-array>
+
 </resources>
