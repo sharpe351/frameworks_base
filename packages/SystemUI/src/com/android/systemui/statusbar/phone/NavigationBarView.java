@@ -26,8 +26,6 @@ import android.animation.ValueAnimator;
 import android.app.StatusBarManager;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
@@ -272,10 +270,6 @@ public class NavigationBarView extends LinearLayout {
                 Settings.System.SOFTKEY_LONG_PRESS_CONFIGURATION, ViewConfiguration.getLongPressTimeout());
 
         mBarTransitions = new NavigationBarTransitions(this);
-
-        mNavBarReceiver = new NavBarReceiver();
-        mContext.registerReceiverAsUser(mNavBarReceiver, UserHandle.ALL,
-                new IntentFilter(NAVBAR_EDIT_ACTION), null, null);
     }
 
     public BarTransitions getBarTransitions() {
@@ -323,7 +317,7 @@ public class NavigationBarView extends LinearLayout {
     public boolean onInterceptTouchEvent(MotionEvent event) {
         initDownStates(event);
         boolean intercept = mTaskSwitchHelper.onInterceptTouchEvent(event);
-        if (!intercept || mInEditMode) {
+        if (!intercept) {
             mDelegateIntercepted = mDelegateHelper.onInterceptTouchEvent(event);
             intercept = mDelegateIntercepted;
         } else {
@@ -1046,8 +1040,39 @@ public class NavigationBarView extends LinearLayout {
         boolean isLayoutRtl = getResources().getConfiguration()
                 .getLayoutDirection() == LAYOUT_DIRECTION_RTL;
         if (mIsLayoutRtl != isLayoutRtl) {
+
+            // We swap all children of the 90 and 270 degree layouts, since they are vertical
+            View rotation90 = mRotatedViews[Surface.ROTATION_90];
+            swapChildrenOrderIfVertical(rotation90.findViewById(R.id.nav_buttons));
+
+            View rotation270 = mRotatedViews[Surface.ROTATION_270];
+            if (rotation90 != rotation270) {
+                swapChildrenOrderIfVertical(rotation270.findViewById(R.id.nav_buttons));
+            }
             mIsLayoutRtl = isLayoutRtl;
-            reorient();
+        }
+    }
+
+
+    /**
+     * Swaps the children order of a LinearLayout if it's orientation is Vertical
+     *
+     * @param group The LinearLayout to swap the children from.
+     */
+    private void swapChildrenOrderIfVertical(View group) {
+        if (group instanceof LinearLayout) {
+            LinearLayout linearLayout = (LinearLayout) group;
+            if (linearLayout.getOrientation() == VERTICAL) {
+                int childCount = linearLayout.getChildCount();
+                ArrayList<View> childList = new ArrayList<>(childCount);
+                for (int i = 0; i < childCount; i++) {
+                    childList.add(linearLayout.getChildAt(i));
+                }
+                linearLayout.removeAllViews();
+                for (int i = childCount - 1; i >= 0; i--) {
+                    linearLayout.addView(childList.get(i));
+                }
+            }
         }
     }
 
@@ -1200,90 +1225,4 @@ public class NavigationBarView extends LinearLayout {
     public interface OnVerticalChangedListener {
         void onVerticalChanged(boolean isVertical);
     }
-
-    void setListeners(OnClickListener recentsClickListener, OnTouchListener recentsPreloadListener,
-                      OnLongClickListener recentsBackListener, OnTouchListener homeSearchActionListener) {
-        mRecentsClickListener = recentsClickListener;
-        mRecentsPreloadListener = recentsPreloadListener;
-        mHomeSearchActionListener = homeSearchActionListener;
-        mRecentsBackListener = recentsBackListener;
-        updateButtonListeners();
-    }
-
-    private void removeButtonListeners() {
-        ViewGroup container = (ViewGroup) mCurrentView.findViewById(R.id.container);
-        int viewCount = container.getChildCount();
-        for (int i = 0; i < viewCount; i++) {
-            View button = container.getChildAt(i);
-            if (button instanceof KeyButtonView) {
-                button.setOnClickListener(null);
-                button.setOnTouchListener(null);
-            }
-        }
-    }
-
-    protected void updateButtonListeners() {
-        View recentView = mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_RECENT);
-        if (recentView != null) {
-            recentView.setOnClickListener(mRecentsClickListener);
-            recentView.setOnTouchListener(mRecentsPreloadListener);
-            recentView.setLongClickable(true);
-            recentView.setOnLongClickListener(mRecentsBackListener);
-        }
-        View backView = mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_BACK);
-        if (backView != null) {
-            backView.setLongClickable(true);
-            backView.setOnLongClickListener(mRecentsBackListener);
-        }
-        View homeView = mCurrentView.findViewWithTag(NavbarEditor.NAVBAR_HOME);
-        if (homeView != null) {
-            homeView.setOnTouchListener(mHomeSearchActionListener);
-        }
-    }
-
-    public boolean isInEditMode() {
-        return mInEditMode;
-    }
-
-    private void setButtonWithTagVisibility(Object tag, boolean visible) {
-        View findView = mCurrentView.findViewWithTag(tag);
-        if (findView != null) {
-            findView.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
-        }
-    }
-
-    // TODO LINK TO THIS ONCE THEMES GOES IN
-    protected void updateResources() {
-        getIcons(mContext.getResources());
-    }
-
-    public class NavBarReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean edit = intent.getBooleanExtra("edit", false);
-            boolean save = intent.getBooleanExtra("save", false);
-            if (edit != mInEditMode) {
-                mInEditMode = edit;
-                if (edit) {
-                    removeButtonListeners();
-                    mEditBar.setEditMode(true);
-                } else {
-                    if (save) {
-                        mEditBar.saveKeys();
-                    }
-                    mEditBar.setEditMode(false);
-                    updateSettings();
-                }
-            }
-        }
-    }
-
-    public void updateSettings() {
-        mEditBar.updateKeys();
-        removeButtonListeners();
-        updateButtonListeners();
-        setDisabledFlags(mDisabledFlags, true /* force */);
-        setMenuVisibility(mShowMenu, true);
-    }
-
 }
