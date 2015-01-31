@@ -80,9 +80,6 @@ public class KeyButtonView extends ImageView {
     private int mLongPressTimeout;
     private int mCode = 4;  // AOSP uses 4 for the back key
 
-    public static final int CURSOR_REPEAT_FLAGS = KeyEvent.FLAG_SOFT_KEYBOARD
-            | KeyEvent.FLAG_KEEP_TOUCH_MODE;
-
     private long mDownTime;
     private long mUpTime;
     int mTouchSlop;
@@ -413,17 +410,10 @@ public class KeyButtonView extends ImageView {
     }
 
     void sendEvent(int action, int flags, long when) {
-        sendEvent(action, flags, when, true);
-    }
-
-    void sendEvent(int action, int flags, long when, boolean applyDefaultFlags) {
         final int repeatCount = (flags & KeyEvent.FLAG_LONG_PRESS) != 0 ? 1 : 0;
-        if (applyDefaultFlags) {
-            flags |= KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY;
-        }
         final KeyEvent ev = new KeyEvent(mDownTime, when, action, mCode, repeatCount,
                 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
-                flags,
+                flags | KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY,
                 InputDevice.SOURCE_KEYBOARD);
         InputManager.getInstance().injectInputEvent(ev,
         InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);

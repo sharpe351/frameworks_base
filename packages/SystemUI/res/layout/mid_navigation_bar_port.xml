@@ -32,13 +32,9 @@
         android:layout_height="match_parent"
         android:layout_weight="0"
         android:scaleType="fitCenter" />
-    <View
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
     <LinearLayout
         android:layout_height="match_parent"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_weight="1"
         android:clipChildren="false"
         android:clipToPadding="false"
@@ -48,46 +44,54 @@
         android:animateLayoutChanges="true">
         <com.android.systemui.statusbar.policy.KeyButtonView
             android:id="@+id/two"
-            android:layout_width="128dp" android:paddingLeft="25dp" android:paddingRight="25dp"
+            android:layout_width="@dimen/navigation_key_width"
             android:layout_height="match_parent"
             systemui:keyRepeat="true"
             android:layout_weight="0" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
         <com.android.systemui.statusbar.policy.KeyButtonView
             android:id="@+id/three"
-            android:layout_width="128dp" android:paddingLeft="25dp" android:paddingRight="25dp"
+            android:layout_width="@dimen/navigation_key_width"
             android:layout_height="match_parent"
             systemui:keyRepeat="true"
             android:layout_weight="0" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
         <com.android.systemui.statusbar.policy.KeyButtonView
             android:id="@+id/four"
-            android:layout_width="128dp" android:paddingLeft="25dp" android:paddingRight="25dp"
+            android:layout_width="@dimen/navigation_key_width"
             android:layout_height="match_parent"
             android:layout_weight="0"
             systemui:keyRepeat="true" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
         <com.android.systemui.statusbar.policy.KeyButtonView
             android:id="@+id/five"
-            android:layout_width="128dp" android:paddingLeft="25dp" android:paddingRight="25dp"
+            android:layout_width="@dimen/navigation_key_width"
             android:layout_height="match_parent"
             android:layout_weight="0"
             systemui:keyRepeat="true" />
     </LinearLayout>
-    <View
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
     <FrameLayout
-        android:layout_width="@dimen/navigation_extra_key_width"
-        android:layout_height="match_parent"
-        android:layout_weight="0"
-        android:layout_marginEnd="2dp" >
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" >
         <com.android.systemui.statusbar.policy.KeyButtonView
-            android:id="@+id/ime_switcher"
-            android:layout_width="@dimen/navigation_extra_key_width"
-            android:layout_height="match_parent"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_ime_switcher_default"
-            android:visibility="invisible"
-            android:contentDescription="@string/accessibility_ime_switch_button" />
+                android:background="#FFAA0000"
+                android:id="@+id/ime_switcher"
+                android:layout_width="@dimen/navigation_extra_key_width"
+                android:layout_weight="0"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/accessibility_ime_switch_button"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_ime_switcher_default"
+                android:visibility="invisible" />
         <com.android.systemui.statusbar.policy.KeyButtonView
             android:id="@+id/six"
             android:layout_width="@dimen/navigation_extra_key_width"
@@ -95,5 +99,4 @@
             android:layout_weight="0"
             android:scaleType="fitCenter" />
     </FrameLayout>
-
 </LinearLayout>
