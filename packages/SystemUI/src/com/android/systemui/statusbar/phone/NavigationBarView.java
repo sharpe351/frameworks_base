@@ -414,8 +414,8 @@ public class NavigationBarView extends LinearLayout {
                 && ((mButtonLayouts > 1 && mImeLayout) || mButtonLayouts == 1)
                 && getButtonView(ACTION_BACK) == null
                 && getButtonView(ACTION_HOME) == null) {
-			setNextLayout(NavbarConstants.DEFAULT_LAYOUT);
-			if (getButtonView(ACTION_BACK) != null)
+            setNextLayout(NavbarConstants.DEFAULT_LAYOUT);
+            if (getButtonView(ACTION_BACK) != null)
                 ((ImageView) getButtonView(ACTION_BACK)).setImageResource(R.drawable.ic_sysbar_back_ime);
             mNavigationIconHints = hints;
             setMenuVisibility(mShowMenu, true);
@@ -488,7 +488,7 @@ public class NavigationBarView extends LinearLayout {
     }
 
     public void notifyLayoutChange(int direction) {
-		mNextLayoutIndex = direction;
+        mNextLayoutIndex = direction;
         if (direction == NavbarConstants.LAYOUT_IME) {
             if (mDisplayingLayoutIndex == NavbarConstants.LAYOUT_IME) {
                 setNextLayout(mCurrentLayout);
@@ -585,7 +585,6 @@ public class NavigationBarView extends LinearLayout {
         if (mButtonLayouts == 1) {
             if (mLegacyMenu) {
                 if (mImeLayout) {
-                    // show hard-coded switchers here when written
                     if (getButtonView(ACTION_IME) != null)
                         getButtonView(ACTION_IME).setVisibility(showingIME ? View.VISIBLE : View.INVISIBLE);
                     if (getButtonView(ACTION_IME_LAYOUT) != null) getButtonView(ACTION_IME_LAYOUT)
@@ -594,6 +593,13 @@ public class NavigationBarView extends LinearLayout {
                     if (getButtonView(ACTION_MENU) != null) getButtonView(ACTION_MENU)
                         .setVisibility(mShowMenu ? View.VISIBLE : View.INVISIBLE);
                 }
+            }
+        } else {
+            if (!showingIME) {
+                if ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_LEFT) != null)
+                        ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_LEFT)).setDrawingAlpha(0.20f);
+                if ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_RIGHT) != null)
+                        ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_RIGHT)).setDrawingAlpha(0.20f);
             }
         }
     }

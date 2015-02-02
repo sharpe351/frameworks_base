@@ -69,6 +69,8 @@ public class LayoutChangerButtonView extends KeyButtonView {
                         : R.drawable.ic_sysbar_layout_left);
             }
         }
+
+        updateAlpha();
     }
 
     public void setImeSwitch(boolean show, int isVertical, boolean isTablet) {
@@ -84,6 +86,17 @@ public class LayoutChangerButtonView extends KeyButtonView {
                         ? R.drawable.ic_sysbar_layout_right_landscape
                         : R.drawable.ic_sysbar_layout_right);
             }
+        }
+
+        updateAlpha();
+    }
+
+    public void updateAlpha() {
+        if (mActions.singleAction == ACTION_LAYOUT_RIGHT
+                || mActions.singleAction == ACTION_LAYOUT_LEFT) {
+            setDrawingAlpha(DEFAULT_LAYOUT_CHANGER_ALPHA);
+        } else {
+            setDrawingAlpha(DEFAULT_QUIESCENT_ALPHA);
         }
     }
 
@@ -101,11 +114,14 @@ public class LayoutChangerButtonView extends KeyButtonView {
                         : R.drawable.ic_sysbar_layout_right);
             }
         }
+
+        updateAlpha();
     }
 
     @Override
     public void setImage() {
         setImageDrawable(NavbarUtils.getIconImage(mContext, mActions.singleAction));
+        updateAlpha();
     }
 
     @Override
