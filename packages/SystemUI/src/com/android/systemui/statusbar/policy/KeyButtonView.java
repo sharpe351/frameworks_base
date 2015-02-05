@@ -195,8 +195,8 @@ public class KeyButtonView extends ImageView {
     }
 
     public void setQuiescentAlpha(float alpha, boolean animate) {
-        if (mActions.singleAction == ACTION_LAYOUT_RIGHT
-                || mActions.singleAction == ACTION_LAYOUT_LEFT) {
+        if (mHasSingleAction && (mActions.singleAction == ACTION_LAYOUT_RIGHT
+                || mActions.singleAction == ACTION_LAYOUT_LEFT)) {
             return;
         }
         mAnimateToQuiescent.cancel();
