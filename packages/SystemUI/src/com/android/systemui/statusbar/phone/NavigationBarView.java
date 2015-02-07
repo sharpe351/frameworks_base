@@ -16,6 +16,8 @@
 
 package com.android.systemui.statusbar.phone;
 
+import static com.android.internal.util.vanir.NavbarConstants.*;
+
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.LayoutTransition;
@@ -55,7 +57,7 @@ import android.widget.Space;
 
 import com.android.internal.util.vanir.KeyButtonInfo;
 import com.android.internal.util.vanir.NavbarConstants;
-import static com.android.internal.util.vanir.NavbarConstants.*;
+import com.android.internal.util.vanir.NavbarUtils;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
@@ -70,18 +72,17 @@ import java.util.ArrayList;
 import android.util.SparseArray;
 
 public class NavigationBarView extends LinearLayout {
-    final static boolean DEBUG = false;
-    final static String TAG = "PhoneStatusBar/NavigationBarView";
+    private static final boolean DEBUG = NavbarUtils.DEBUG;
+    private final static String TAG = "PhoneStatusBar/NavigationBarView";
 
     private static final int CHANGER_LEFT_SIDE = 0;
     private static final int CHANGER_RIGHT_SIDE = 1;
 
-    // slippery nav bar when everything is disabled, e.g. during setup
     final static boolean SLIPPERY_WHEN_DISABLED = true;
-
     final static boolean NAVBAR_ALWAYS_AT_RIGHT = true;
 
     private BaseStatusBar mBar;
+
     final Display mDisplay;
     View mCurrentView = null;
     View[] mRotatedViews = new View[4];
@@ -415,8 +416,8 @@ public class NavigationBarView extends LinearLayout {
                 && ((mButtonLayouts > 1 && mImeLayout) || mButtonLayouts == 1)
                 && getButtonView(ACTION_BACK) == null
                 && getButtonView(ACTION_HOME) == null) {
-			setNextLayout(NavbarConstants.DEFAULT_LAYOUT);
-			if (getButtonView(ACTION_BACK) != null)
+            setNextLayout(NavbarConstants.DEFAULT_LAYOUT);
+            if (getButtonView(ACTION_BACK) != null)
                 ((ImageView) getButtonView(ACTION_BACK)).setImageResource(R.drawable.ic_sysbar_back_ime);
             mNavigationIconHints = hints;
             setMenuVisibility(mShowMenu, true);
@@ -489,7 +490,7 @@ public class NavigationBarView extends LinearLayout {
     }
 
     public void notifyLayoutChange(int direction) {
-		mNextLayoutIndex = direction;
+        mNextLayoutIndex = direction;
         if (direction == NavbarConstants.LAYOUT_IME) {
             if (mDisplayingLayoutIndex == NavbarConstants.LAYOUT_IME) {
                 setNextLayout(mCurrentLayout);
@@ -586,7 +587,6 @@ public class NavigationBarView extends LinearLayout {
         if (mButtonLayouts == 1) {
             if (mLegacyMenu) {
                 if (mImeLayout) {
-                    // show hard-coded switchers here when written
                     if (getButtonView(ACTION_IME) != null)
                         getButtonView(ACTION_IME).setVisibility(showingIME ? View.VISIBLE : View.INVISIBLE);
                     if (getButtonView(ACTION_IME_LAYOUT) != null) getButtonView(ACTION_IME_LAYOUT)
@@ -595,6 +595,13 @@ public class NavigationBarView extends LinearLayout {
                     if (getButtonView(ACTION_MENU) != null) getButtonView(ACTION_MENU)
                         .setVisibility(mShowMenu ? View.VISIBLE : View.INVISIBLE);
                 }
+            }
+        } else {
+            if (!showingIME) {
+                if ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_LEFT) != null)
+                        ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_LEFT)).setDrawingAlpha(0.20f);
+                if ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_RIGHT) != null)
+                        ((LayoutChangerButtonView) getButtonView(ACTION_LAYOUT_RIGHT)).setDrawingAlpha(0.20f);
             }
         }
     }

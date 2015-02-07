@@ -61,6 +61,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // database gets upgraded properly. At a minimum, please confirm that 'upgradeVersion'
     // is properly propagated through your change.  Not doing so will result in a loss of user
     // settings.
-    private static final int DATABASE_VERSION = 120;
+    private static final int DATABASE_VERSION = 121;
 
     private Context mContext;
     private int mUserHandle;
@@ -1912,6 +1913,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             upgradeVersion = 120;
         }
 
+        if (upgradeVersion < 121) {
+            String[] settingsToMove = Settings.Secure.NAVIGATION_RING_TARGETS;
+
+            moveSettingsToNewTable(db, TABLE_SYSTEM, TABLE_SECURE,
+                    settingsToMove, true);
+            upgradeVersion = 121;
+        }
+
         // *** Remember to update DATABASE_VERSION above!
 
         if (upgradeVersion != currentVersion) {
@@ -2342,6 +2351,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    private void loadProtectedSmsSetting(SQLiteStatement stmt) {
+        String[] regAddresses = mContext.getResources()
+                .getStringArray(R.array.def_protected_sms_list_values);
+        if (regAddresses.length > 0) {
+            loadSetting(stmt,
+                    Settings.Secure.PROTECTED_SMS_ADDRESSES,
+                    TextUtils.join("|", regAddresses));
+        }
+    }
+
     private void loadSettings(SQLiteDatabase db) {
         loadSystemSettings(db);
         loadSecureSettings(db);
@@ -2400,6 +2419,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             loadIntegerSetting(stmt, Settings.System.STATUS_BAR_BATTERY_STYLE,
                     R.integer.def_battery_style);
+
+            loadIntegerSetting(stmt, Settings.System.ENABLE_PEOPLE_LOOKUP,
+                    R.integer.def_people_lookup);
 
         } finally {
             if (stmt != null) stmt.close();
@@ -2543,6 +2565,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     R.bool.def_cm_stats_collection);
 
             loadDefaultThemeSettings(stmt);
+            loadProtectedSmsSetting(stmt);
         } finally {
             if (stmt != null) stmt.close();
         }

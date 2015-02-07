@@ -30,6 +30,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.MathUtils;
@@ -42,7 +43,6 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.internal.util.cm.LockscreenShortcutsHelper;
@@ -82,7 +82,6 @@ public class NotificationPanelView extends PanelView implements
     private KeyguardStatusBarView mKeyguardStatusBar;
     private View mQsContainer;
     private QSPanel mQsPanel;
-    private LinearLayout mTaskManagerPanel;
     private KeyguardStatusView mKeyguardStatusView;
     private ObservableScrollView mScrollView;
     private TextView mClockView;
@@ -192,15 +191,6 @@ public class NotificationPanelView extends PanelView implements
         super(context, attrs);
         mSettingsObserver = new SettingsObserver(mHandler);
         mLockPatternUtils = new LockPatternUtils(mContext);
-        mDoubleTapGesture = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-                if(pm != null)
-                    pm.goToSleep(e.getEventTime());
-                return true;
-            }
-        });
     }
 
     public void setStatusBar(PhoneStatusBar bar) {
@@ -216,7 +206,6 @@ public class NotificationPanelView extends PanelView implements
         mKeyguardStatusView = (KeyguardStatusView) findViewById(R.id.keyguard_status_view);
         mQsContainer = findViewById(R.id.quick_settings_container);
         mQsPanel = (QSPanel) findViewById(R.id.quick_settings_panel);
-        mTaskManagerPanel = (LinearLayout) findViewById(R.id.task_manager_panel);
         mClockView = (TextView) findViewById(R.id.clock_view);
         mScrollView = (ObservableScrollView) findViewById(R.id.scroll_view);
         mScrollView.setListener(this);
@@ -323,7 +312,6 @@ public class NotificationPanelView extends PanelView implements
         }
         mNotificationStackScroller.updateIsSmallScreen(
                 mHeader.getCollapsedHeight() + mQsPeekHeight);
-        requestPanelHeightUpdate();
     }
 
     @Override
@@ -618,7 +606,8 @@ public class NotificationPanelView extends PanelView implements
         }
         if (mDoubleTapToSleepEnabled
                 && mStatusBarState == StatusBarState.KEYGUARD
-                && event.getY() < mStatusBarHeaderHeight) {
+                && event.getY() < mStatusBarHeaderHeight
+                && mDoubleTapGesture != null) {
             mDoubleTapGesture.onTouchEvent(event);
         }
         resetDownStates(event);
@@ -1052,9 +1041,7 @@ public class NotificationPanelView extends PanelView implements
         mNotificationStackScroller.setScrollingEnabled(
                 mStatusBarState != StatusBarState.KEYGUARD && (!mQsExpanded
                         || mQsExpansionFromOverscroll));
-        if (!getResources().getBoolean(R.bool.config_showTaskManagerSwitcher)) {
-            mQsPanel.setVisibility(expandVisually ? View.VISIBLE : View.INVISIBLE);
-        }
+        mQsPanel.setVisibility(expandVisually ? View.VISIBLE : View.INVISIBLE);
         mQsContainer.setVisibility(
                 mKeyguardShowing && !expandVisually ? View.INVISIBLE : View.VISIBLE);
         mScrollView.setTouchEnabled(mQsExpanded);
@@ -1244,24 +1231,13 @@ public class NotificationPanelView extends PanelView implements
 
         final float w = getMeasuredWidth();
         float region = (w * (1.f/3.f)); // TODO overlay region fraction?
-        final boolean showQsOverride = isLayoutRtl() ? (x < region) : (w - region < x)
-                        && mStatusBarState == StatusBarState.SHADE;
+        boolean showQsOverride = isLayoutRtl() ? (x < region) : (w - region < x);
+        showQsOverride = showQsOverride && mStatusBarState == StatusBarState.SHADE;
 
         if (mQsExpanded) {
             return onHeader || (mScrollView.isScrolledToBottom() && yDiff < 0) && isInQsArea(x, y);
         } else {
             return onHeader || showQsOverride;
-        }
-    }
-
-    public void setTaskManagerVisibility(boolean mTaskManagerShowing) {
-        if (getResources().getBoolean(R.bool.config_showTaskManagerSwitcher)) {
-            cancelAnimation();
-            boolean expandVisually = mQsExpanded || mStackScrollerOverscrolling;
-            mQsPanel.setVisibility(expandVisually && !mTaskManagerShowing
-                    ? View.VISIBLE : View.GONE);
-            mTaskManagerPanel.setVisibility(expandVisually && mTaskManagerShowing
-                    ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -1313,14 +1289,6 @@ public class NotificationPanelView extends PanelView implements
             float panelHeightQsExpanded = calculatePanelHeightQsExpanded();
             float t = (expandedHeight - panelHeightQsCollapsed)
                     / (panelHeightQsExpanded - panelHeightQsCollapsed);
-
-            // set quick settings panel view max expansion if it does
-            // not reach the notification position when keyguard showing
-            if (getResources().getBoolean(R.bool.config_showTaskManagerSwitcher)
-                    && (expandedHeight <= panelHeightQsCollapsed
-                    || panelHeightQsExpanded <= panelHeightQsCollapsed)) {
-                t = 1f;
-            }
 
             setQsExpansion(mQsMinExpansionHeight
                     + t * (getTempQsMaxExpansion() - mQsMinExpansionHeight));
@@ -1963,6 +1931,24 @@ public class NotificationPanelView extends PanelView implements
             mStatusBarLockedOnSecureKeyguard = Settings.Secure.getIntForUser(
                     resolver, Settings.Secure.STATUS_BAR_LOCKED_ON_SECURE_KEYGUARD, 0,
                     UserHandle.USER_CURRENT) == 1;
+
+            if (mDoubleTapToSleepEnabled) {
+                if (mDoubleTapGesture == null) {
+                    mDoubleTapGesture = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onDoubleTap(MotionEvent e) {
+                            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+                            if(pm != null)
+                                pm.goToSleep(e.getEventTime());
+                            return true;
+                        }
+                    });
+                }
+            } else {
+                if (mDoubleTapGesture != null) {
+                    mDoubleTapGesture = null;
+                }
+            }
         }
     }
 }
