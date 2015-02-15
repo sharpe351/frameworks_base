@@ -138,6 +138,8 @@ import static android.view.WindowManagerPolicy.WindowManagerFuncs.CAMERA_LENS_CO
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.CAMERA_LENS_UNCOVERED;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.CAMERA_LENS_COVERED;
 
+import static com.android.internal.util.vanir.HardwareButtonConstants.*;
+
 /**
  * WindowManagerPolicy implementation for the Android phone UI.  This
  * introduces a new method suffix, Lp, for an internal lock of the
@@ -187,19 +189,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     static public final String SYSTEM_DIALOG_REASON_RECENT_APPS = "recentapps";
     static public final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
     static public final String SYSTEM_DIALOG_REASON_ASSIST = "assist";
-
-    // Available custom actions to perform on a key press.
-    // Must match values for KEY_HOME_LONG_PRESS_ACTION in:
-    // core/java/android/provider/Settings.java
-    private static final int KEY_ACTION_NOTHING = 0;
-    private static final int KEY_ACTION_MENU = 1;
-    private static final int KEY_ACTION_APP_SWITCH = 2;
-    private static final int KEY_ACTION_SEARCH = 3;
-    private static final int KEY_ACTION_VOICE_SEARCH = 4;
-    private static final int KEY_ACTION_IN_APP_SEARCH = 5;
-    private static final int KEY_ACTION_LAUNCH_CAMERA = 6;
-    private static final int KEY_ACTION_SLEEP = 7;
-    private static final int KEY_ACTION_LAST_APP = 8;
 
     // Masks for checking presence of hardware keys.
     // Must match values in core/res/res/values/config.xml
@@ -509,6 +498,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     int mForcingShowNavBarLayer;
 
     boolean mDevForceNavbar = false;
+    boolean mDisableKeysForNavbar = false;
 
     // States of keyguard dismiss.
     private static final int DISMISS_KEYGUARD_NONE = 0; // Keyguard not being dismissed.
@@ -829,6 +819,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.DEV_FORCE_SHOW_NAVBAR), false, this,
+                    UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.DEV_FORCE_DISABLE_HARDKEYS), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HOME_WAKE_SCREEN), false, this,
@@ -1283,8 +1276,31 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             case KEY_ACTION_MENU:
                 triggerVirtualKeypress(KeyEvent.KEYCODE_MENU);
                 break;
+            case KEY_ACTION_BACK:
+                triggerVirtualKeypress(KeyEvent.KEYCODE_BACK);
+                break;
+            case KEY_ACTION_HOME:
+                launchHomeFromHotKey();
+                break;
             case KEY_ACTION_APP_SWITCH:
                 toggleRecentApps();
+                break;
+            case KEY_ACTION_KILL:
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ActionUtils.killForegroundApp(mContext,mCurrentUserId)) {
+                            Toast.makeText(mContext, R.string.app_killed_message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                break;
+            case KEY_ACTION_NAVBAR:
+                final ContentResolver resolver = mContext.getContentResolver();
+                Settings.System.putInt(resolver,
+                        Settings.System.DEV_FORCE_SHOW_NAVBAR, mDevForceNavbar ? 0 : 1);
+                mContext.sendBroadcast(new Intent(
+                        "vanir.android.settings.TOGGLE_NAVBAR_FOR_HARDKEYS"));
                 break;
             case KEY_ACTION_SEARCH:
                 launchAssistAction();
@@ -1514,7 +1530,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private void updateKeyAssignments() {
         int activeHardwareKeys = mDeviceHardwareKeys;
 
-        if (mDevForceNavbar) {
+        if (mDevForceNavbar && mDisableKeysForNavbar) {
             activeHardwareKeys = 0;
         }
         final boolean hasMenu = (activeHardwareKeys & KEY_MASK_MENU) != 0;
@@ -1810,11 +1826,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateEdgeGestureListenerState();
             }
 
-            boolean devForceNavbar = Settings.System.getIntForUser(resolver,
+            mDisableKeysForNavbar = Settings.System.getIntForUser(resolver,
+                    Settings.System.DEV_FORCE_DISABLE_HARDKEYS, 0, UserHandle.USER_CURRENT) == 1;
+            mDevForceNavbar = Settings.System.getIntForUser(resolver,
                     Settings.System.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
-            if (devForceNavbar != mDevForceNavbar) {
-                mDevForceNavbar = devForceNavbar;
-            }
 
             mImmersiveState = Settings.System.getIntForUser(resolver,
                     Settings.System.GLOBAL_IMMERSIVE_MODE_STATE, 0, UserHandle.USER_CURRENT) == 1;
@@ -1840,7 +1855,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             updateKeyAssignments();
 
-			mDefaultLandscape = Settings.System.getInt(resolver,
+            mDefaultLandscape = Settings.System.getInt(resolver,
                     Settings.System.DEFAULT_LANDSCAPE_ORIENTATION, 0) == 1;
 
             // Configure rotation lock.

@@ -2600,6 +2600,11 @@ public final class Settings {
         */
         public static final String DEV_FORCE_SHOW_NAVBAR = "dev_force_show_navbar";
 
+        /**
+         * Disable the hardware keys when the navbar is enabled
+         * @hide
+         */
+        public static final String DEV_FORCE_DISABLE_HARDKEYS = "dev_force_disable_hardkeys";
 
         /**
          * Date format string
