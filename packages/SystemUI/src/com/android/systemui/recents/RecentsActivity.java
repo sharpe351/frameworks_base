@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewStub;
 import android.widget.Toast;
 import com.android.systemui.R;
+import com.android.systemui.recents.RecentsConfiguration;
 import com.android.systemui.recents.misc.DebugTrigger;
 import com.android.systemui.recents.misc.ReferenceCountedTrigger;
 import com.android.systemui.recents.misc.SystemServicesProxy;
@@ -273,7 +274,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
             if (mRecentsView.hasSearchBar()) {
                 mRecentsView.setSearchBarVisibility(isRecentsSearchbarEnabled() ? View.VISIBLE : View.GONE);
             } else {
-                addSearchBarAppWidgetView();
+                RecentsConfiguration.searchBarSpaceHeightPx = 0;
             }
         }
 

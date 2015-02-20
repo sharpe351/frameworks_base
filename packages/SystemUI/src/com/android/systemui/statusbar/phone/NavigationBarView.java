@@ -60,6 +60,7 @@ import com.android.internal.util.vanir.NavbarConstants;
 import com.android.internal.util.vanir.NavbarUtils;
 
 import com.android.systemui.R;
+import com.android.systemui.cm.UserContentObserver;
 import com.android.systemui.statusbar.BaseStatusBar;
 import com.android.systemui.statusbar.DelegateViewHelper;
 import com.android.systemui.statusbar.policy.DeadZone;

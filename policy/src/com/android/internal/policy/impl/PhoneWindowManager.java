@@ -1850,8 +1850,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (mGlobalImmersiveModeStyle != mImmersiveModeBehavior) {
                 mGlobalImmersiveModeStyle = mImmersiveModeBehavior;
             }
-            mNavigationBarLeftInLandscape = Settings.System.getInt(resolver,
-                    Settings.System.NAVBAR_LEFT_IN_LANDSCAPE, 0) == 1;
+
+            boolean devForceNavbar = Settings.Secure.getIntForUser(resolver,
+                    Settings.Secure.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
+            if (devForceNavbar != mDevForceNavbar) {
+                mDevForceNavbar = devForceNavbar;
+            }
+
+            mNavigationBarLeftInLandscape = Settings.System.getIntForUser(resolver,
+                    Settings.System.NAVBAR_LEFT_IN_LANDSCAPE, 0, UserHandle.USER_CURRENT) == 1;
 
             updateKeyAssignments();
 
@@ -5697,6 +5704,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // and then updates our own bookkeeping based on the now-
                 // current user.
                 mSettingsObserver.onChange(false);
+
+                if (mGlobalActions != null) {
+                    mGlobalActions.updatePowerMenuActions();
+                }
 
                 // force a re-application of focused window sysui visibility.
                 // the window may never have been shown for this user
