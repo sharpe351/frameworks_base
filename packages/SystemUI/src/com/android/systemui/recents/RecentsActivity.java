@@ -24,10 +24,10 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -37,7 +37,6 @@ import android.view.View;
 import android.view.ViewStub;
 import android.widget.Toast;
 import com.android.systemui.R;
-import com.android.systemui.recents.RecentsConfiguration;
 import com.android.systemui.recents.misc.DebugTrigger;
 import com.android.systemui.recents.misc.ReferenceCountedTrigger;
 import com.android.systemui.recents.misc.SystemServicesProxy;
@@ -274,7 +273,7 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
             if (mRecentsView.hasSearchBar()) {
                 mRecentsView.setSearchBarVisibility(isRecentsSearchbarEnabled() ? View.VISIBLE : View.GONE);
             } else {
-                RecentsConfiguration.searchBarSpaceHeightPx = 0;
+                addSearchBarAppWidgetView();
             }
         }
 
