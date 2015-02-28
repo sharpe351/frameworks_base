@@ -1857,10 +1857,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 updateEdgeGestureListenerState();
             }
 
-            mDisableKeysForNavbar = Settings.System.getIntForUser(resolver,
-                    Settings.System.DEV_FORCE_DISABLE_HARDKEYS, 0, UserHandle.USER_CURRENT) == 1;
             mDevForceNavbar = Settings.System.getIntForUser(resolver,
                     Settings.System.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
+            mDisableKeysForNavbar = Settings.System.getIntForUser(resolver,
+                    Settings.System.DEV_FORCE_DISABLE_HARDKEYS, 0, UserHandle.USER_CURRENT) == 1;
 
             mImmersiveState = Settings.System.getIntForUser(resolver,
                     Settings.System.GLOBAL_IMMERSIVE_MODE_STATE, 0, UserHandle.USER_CURRENT) == 1;
@@ -1880,12 +1880,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             if (mGlobalImmersiveModeStyle != mImmersiveModeBehavior) {
                 mGlobalImmersiveModeStyle = mImmersiveModeBehavior;
-            }
-
-            boolean devForceNavbar = Settings.Secure.getIntForUser(resolver,
-                    Settings.Secure.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
-            if (devForceNavbar != mDevForceNavbar) {
-                mDevForceNavbar = devForceNavbar;
             }
 
             mNavigationBarLeftInLandscape = Settings.System.getIntForUser(resolver,
