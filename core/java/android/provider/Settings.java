@@ -1255,7 +1255,6 @@ public final class Settings {
             for (String s : Secure.NAVIGATION_RING_TARGETS) {
                 MOVED_TO_SECURE.add(s);
             }
-            MOVED_TO_SECURE.add(Secure.DEV_FORCE_SHOW_NAVBAR);
             MOVED_TO_SECURE.add(Secure.KEYBOARD_BRIGHTNESS);
             MOVED_TO_SECURE.add(Secure.BUTTON_BRIGHTNESS);
             MOVED_TO_SECURE.add(Secure.BUTTON_BACKLIGHT_TIMEOUT);
@@ -2618,21 +2617,16 @@ public final class Settings {
 
         /**
          * Developer options - Navigation Bar show switch
-         * @deprecated Use {@link android.provider.Settings.Secure#DEV_FORCE_SHOW_NAVBAR} instead
          * @hide
          */
-        @Deprecated
-        public static final String DEV_FORCE_SHOW_NAVBAR = Secure.DEV_FORCE_SHOW_NAVBAR;
+        public static final String DEV_FORCE_SHOW_NAVBAR = "dev_force_show_navbar";
 
-<<<<<<< HEAD
         /**
          * Disable the hardware keys when the navbar is enabled
          * @hide
          */
         public static final String DEV_FORCE_DISABLE_HARDKEYS = "dev_force_disable_hardkeys";
 
-=======
->>>>>>> ee41598d8c4217894c39ebecc5d04b5476732ce7
         /**
          * Date format string
          *   mm/dd/yyyy
@@ -6098,12 +6092,6 @@ public final class Settings {
          * @hide
          */
         public static final String POWER_MENU_ACTIONS = "power_menu_actions";
-
-        /**
-         * Developer options - Navigation Bar show switch
-         * @hide
-         */
-        public static final String DEV_FORCE_SHOW_NAVBAR = "dev_force_show_navbar";
 
         /**
          * The keyboard brightness to be used while the screen is on.
