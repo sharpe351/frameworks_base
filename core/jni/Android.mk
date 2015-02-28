@@ -263,6 +263,15 @@ ifeq ($(WITH_MALLOC_LEAK_CHECK),true)
 	LOCAL_CFLAGS += -DMALLOC_LEAK_CHECK
 endif
 
+ifeq ($(USE_LTO),true)
+LOCAL_CFLAGS += \
+    -O2 \
+    $(EXODUS_LTO_FLAGS) \
+    $(DEBUG_SYMBOL_FLAGS) \
+    $(DEBUG_FRAME_POINTER_FLAGS)
+LOCAL_LDFLAGS += -O2 $(EXODUS_LTO_FLAGS)
+endif
+
 LOCAL_MODULE:= libandroid_runtime
 
 include external/stlport/libstlport.mk
