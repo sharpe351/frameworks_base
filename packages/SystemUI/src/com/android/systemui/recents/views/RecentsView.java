@@ -35,6 +35,7 @@ import android.net.Uri;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewAnimationUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -93,7 +94,7 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
     boolean mAlreadyLaunchingTask;
 
     private ActivityManager mAm;
-    private int mTotalMem;
+    private long mTotalMem;
 
     public RecentsView(Context context) {
         super(context);
@@ -377,24 +378,18 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
 
         MemoryInfo memInfo = new MemoryInfo();
         mAm.getMemoryInfo(memInfo);
-            int available = (int)(memInfo.availMem / 1048576L);
-            mMemText.setText("Free RAM: " + String.valueOf(available) + "MB");
-            mMemBar.setMax(mTotalMem);
-            mMemBar.setProgress(available);
+        int available = (int)(memInfo.availMem / 1048576L);
+
+        mMemText.setText("Free RAM: " + String.valueOf(available) + "MB");
+        mMemBar.setMax((int)(mTotalMem / 1048576L));
+        mMemBar.setProgress(available);
     }
 
-    public int getTotalMemory() {
-        int memory = 0;
-        try {
-            final FileReader localFileReader = new FileReader("/proc/meminfo");
-            final BufferedReader localBufferedReader = new BufferedReader(localFileReader, 8192);
-            String str2 = localBufferedReader.readLine(); // meminfo
-            String[] arrayOfString = str2.split("\\s+");
-            memory = Integer.valueOf(arrayOfString[1]).intValue() * 1024;
-            localBufferedReader.close();
-        } catch (IOException e) {
-        }
-        return memory / 1048576;
+    public long getTotalMemory() {
+        MemoryInfo memInfo = new ActivityManager.MemoryInfo();
+        mAm.getMemoryInfo(memInfo);
+        long totalMemory = memInfo.totalMem;
+        return totalMemory;
     }
 
     public void noUserInteraction() {
@@ -649,7 +644,7 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
         if (tv == null) {
             post(launchRunnable);
         } else {
-            if (!task.group.isFrontMostTask(task)) {
+            if (task.group != null && !task.group.isFrontMostTask(task)) {
                 // For affiliated tasks that are behind other tasks, we must animate the front cards
                 // out of view before starting the task transition
                 stackView.startLaunchTaskAnimation(tv, launchRunnable, lockToTask);

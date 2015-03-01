@@ -133,6 +133,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private final boolean mShowSilentToggle;
     private Profile mChosenProfile;
     private final boolean mShowScreenRecord;
+    private boolean showReboot;
 
     // Power menu customizations
     String mActions;
@@ -186,7 +187,13 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
      * Show the global actions dialog (creating if necessary)
      * @param keyguardShowing True if keyguard is showing
      */
+
     public void showDialog(boolean keyguardShowing, boolean isDeviceProvisioned) {
+        showDialog(keyguardShowing, isDeviceProvisioned, false);
+    }
+
+    public void showDialog(boolean keyguardShowing, boolean isDeviceProvisioned, boolean mShowReboot) {
+        showReboot = mShowReboot;
         mKeyguardShowing = keyguardShowing;
         mDeviceProvisioned = isDeviceProvisioned;
         if (mDialog != null && mUiContext == null) {
@@ -303,6 +310,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             actionsArray = mActions.split("\\|");
         }
 
+        // Always add the power off option
+        mItems.add(new PowerAction());
+
         ArraySet<String> addedKeys = new ArraySet<String>();
         for (int i = 0; i < actionsArray.length; i++) {
             String actionKey = actionsArray[i];
@@ -311,7 +321,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 continue;
             }
             if (GLOBAL_ACTION_KEY_POWER.equals(actionKey)) {
-                mItems.add(new PowerAction());
+                continue;
             } else if (GLOBAL_ACTION_KEY_REBOOT.equals(actionKey)) {
                 mItems.add(new RebootAction());
             } else if (GLOBAL_ACTION_KEY_AIRPLANE.equals(actionKey)) {
@@ -1328,8 +1338,8 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
     protected void updatePowerMenuActions() {
         ContentResolver resolver = mContext.getContentResolver();
-        mActions = Settings.Global.getStringForUser(resolver,
-                Settings.Global.POWER_MENU_ACTIONS, UserHandle.USER_CURRENT);
+        mActions = Settings.Secure.getStringForUser(resolver,
+                Settings.Secure.POWER_MENU_ACTIONS, UserHandle.USER_CURRENT);
         mProfilesEnabled = Settings.System.getInt(resolver,
                 Settings.System.SYSTEM_PROFILES_ENABLED, 1) != 0;
         mImmersiveAllowed = Settings.System.getInt(resolver,
