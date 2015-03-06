@@ -2087,7 +2087,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                 && !accessibilityForcesLaunch
                 && mPowerManager.isScreenOn()
                 && !keyguard.isShowingAndNotOccluded()
-                && !keyguard.isInputRestricted();
+                && !keyguard.isInputRestricted()
                 && !isIMEShowing;
 
         try {
