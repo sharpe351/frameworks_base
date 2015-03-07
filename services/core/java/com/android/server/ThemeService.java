@@ -402,12 +402,12 @@ public class ThemeService extends IThemeService.Stub {
         }
 
         if (request.getAlarmThemePackageName() != null) {
-            updateAlarms(request.getAlarmThemePackageName());
+            updateNotifications(request.getAlarmThemePackageName());
             incrementProgress(progressIncrement);
         }
 
         if (request.getRingtoneThemePackageName() != null) {
-            updateRingtones(request.getRingtoneThemePackageName());
+            updateNotifications(request.getRingtoneThemePackageName());
             incrementProgress(progressIncrement);
         }
         Environment.setUserRequired(true);
