@@ -128,6 +128,7 @@ import android.widget.TextView;
 
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.cm.ActionUtils;
+import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardHostView.OnDismissAction;
 import com.android.keyguard.ViewMediatorCallback;
 import com.android.systemui.BatteryMeterView;
@@ -530,7 +531,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mGreeting = Settings.System.getStringForUser(resolver,
                     Settings.System.STATUS_BAR_GREETING,
                     UserHandle.USER_CURRENT);
-            if (mGreeting != null && !TextUtils.isEmpty(mGreeting)) {
+            if (mGreeting != null && !TextUtils.isEmpty(mGreeting) && mExodusLabel != null) {
                 mExodusLabel.setText(mGreeting);
             }
 
@@ -1143,7 +1144,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mSuController = new SuControllerImpl(mContext);
 
         if (isMSim()) {
-            mMSimNetworkController = new MSimNetworkControllerImpl(mContext);
+            if (mMSimNetworkController == null) {
+                mMSimNetworkController = new MSimNetworkControllerImpl(mContext, mHandler);
+            }
             MSimSignalClusterView signalCluster = (MSimSignalClusterView)
                     mStatusBarView.findViewById(R.id.msim_signal_cluster);
             MSimSignalClusterView signalClusterKeyguard = (MSimSignalClusterView)
@@ -1181,7 +1184,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 //});
             }
         } else {
-            mNetworkController = new NetworkControllerImpl(mContext);
+            if (mNetworkController == null) {
+                mNetworkController = new NetworkControllerImpl(mContext);
+            }
             final SignalClusterView signalCluster =
                 (SignalClusterView)mStatusBarView.findViewById(R.id.signal_cluster);
             final SignalClusterView signalClusterKeyguard =
@@ -2511,7 +2516,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                                 .alpha(1f)
                                 .setDuration(320)
                                 .setInterpolator(ALPHA_IN)
-                                .setStartDelay(50)
+                                .setStartDelay(100)
                                 .withEndAction(new Runnable() {
                             @Override
                             public void run() {
@@ -3772,6 +3777,28 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         && mGesturePanelView.isGesturePanelAttached()) removeGesturePanelView();
             }
             else if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                if (mShowLabel && mGreeting != null && !TextUtils.isEmpty(mGreeting)) {
+                    final LockPatternUtils lockPatternUtils = new LockPatternUtils(context);
+                    if (lockPatternUtils.isLockScreenDisabled()) {
+                        if (mNotificationIconArea.getVisibility() != View.INVISIBLE) {
+                            mNotificationIconArea.setAlpha(0f);
+                            mNotificationIconArea.setVisibility(View.INVISIBLE);
+                        }
+                        mExodusLabel.setVisibility(View.VISIBLE);
+                        mExodusLabel.animate().cancel();
+                        mExodusLabel.animate()
+                                .alpha(1f)
+                                .setDuration(320)
+                                .setInterpolator(ALPHA_IN)
+                                .setStartDelay(100)
+                                .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                labelAnimatorFadeOut(true);
+                            }
+                        });
+                    }
+                }
                 mScreenOn = true;
                 // work around problem where mDisplay.getRotation() is not stable while screen is off (bug 7086018)
                 repositionNavigationBar();
@@ -3874,6 +3901,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (mZenModeController != null) {
             mZenModeController.setUserId(mCurrentUserId);
         }
+        if (mMSimNetworkController != null) {
+            mMSimNetworkController.setUserId(mCurrentUserId);
+        }
     }
 
     private void resetUserSetupObserver() {
@@ -3916,9 +3946,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mRecreating = true;
 
         if (mMSimNetworkController != null) {
-            mContext.unregisterReceiver(mMSimNetworkController);
+            mMSimNetworkController.removeAllSignalClusters();
         } else if (mNetworkController != null) {
-            mContext.unregisterReceiver(mNetworkController);
+            mNetworkController.removeAllSignalClusters();
         }
 
         removeHeadsUpView();
